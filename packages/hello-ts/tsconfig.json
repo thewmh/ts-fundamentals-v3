@@ -3,5 +3,6 @@
         "outDir": "dist",
         "target": "ES3"
     },
-    "include": ["src"]
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
 }
