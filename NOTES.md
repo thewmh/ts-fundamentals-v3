@@ -822,3 +822,242 @@ Conceptually, what is happening above is very similar. By using the `asserts ___
 
 ## Nullish Values
 
+There are situations where you need to plan for and deal w/ the possibility that values are `null`, `undefined`, or `void`. `null` indicates that there is a value for something and that value is nothing. This nothing is very much a defined value, and is certainly a presence — not an absence — of infomation.
+
+```
+const userInfo = {
+    name: "FirstName",
+    email: "email@address.com",
+    secondaryEmail: null, // user has no secondaryEmail
+}
+```
+
+`undefined` means the value isn't available (yet?). In the following example, `completedAt` will be set at some point but there is a period of time when it hasn't been set. `undefined` is an unambiguous indication thhat there may be something different in the future:
+
+```
+const formInProgress = {
+    createdAt: new Date(),
+    data: new FormData(),
+    completedAt: undefined
+}
+
+function submitForm() {
+    formInProgress.completedAt = new Date()
+}
+```
+
+`void` should be used explicitly for function returns when the return value of a function should be ignored.
+
+```
+console.log(`console.log returns nothing.`)
+```
+
+The non-null assertion operator `!.` is used to case away the possibility that a value might be `null` or `undefined`. The value still could be `null` or `undefined`, this operator just tells TS to ignore that possibility. If the value does turn out to be missing, you will get `cannot call foo on undefined` errors at runtime.
+
+```
+type GroceryCart = {
+    fruits?: { name: string; qty: number }[]
+    vegetables?: { name: string; qty: number }[]
+}
+
+const cart: GroceryCart = {}
+
+cart.fruits.push({ name: "kumkuat", qty: 1 })
+// Object is possibly 'undefined'
+
+cart.fruits!.push({ name: "kumkuat", qty: 1 })
+```
+
+It is not recommended to use the non-null assertion operator in your app, but if your test infrastructure represents a `throw` as a test failure (most should) this is a great type guard to use in your test suite. In the above situation, if `fruits` was expected to be present ans it isn't, that is a reasonable test failure.
+
+The definite assignment `!:` operator is used to supress TS's objections about a class field being used, when it can't be proven that it was initialized:
+
+```
+class ThingWithAsyncSetup {
+    setupPromise: Promise<any>
+    isSetup: boolean // has no initializer and is not definitely assigned in the constructor.
+
+    constructor() {
+        this.setupPromise = new Promise((resolve) => {
+            this.isSetup = false
+            return this.doSetup()
+        }).then(() => {
+            this.isSetup = true
+        })
+
+        private async doSetup() {
+            // async things
+        }
+    }
+}
+```
+
+TS cannot tell the difference between a synchronous callback vs an asynchronous callback, which is why the error will be thrown for `isSetup`. If instead, because YOU know the boolean will get initialized and TS should STFU, when setting `isSetup` up, do it like so: `isSetup!: boolean` and TS will calm down. A great place to use the definite assignment operator is with lifecycle hooks.
+
+## Generics
+
+ Generics allow us to parameterize types, which unlocks the opportunity to reuse types broadly across a TS project. Earlier, we saw dictionary data structures that could be types using index signatures:
+
+ ```
+ const phones: {
+    [k: string]: {
+        customerId: string
+        areaCode: string
+        num: string
+    }
+ } = {}
+
+ phones.home
+ phones.work
+ phones.fax
+ phones.mobile
+ ```
+
+ Sometimes, it is more convenient to organize data as key-value dictionaries, and other times more convenient to use arrays or lists. It would be nice to have some kind of utility that would allow us to convert a "list of things" into a "dictionary of things". We'll start w/ this array of objects:
+
+ ```
+ const phoneList = [
+    { customerId: "0001", areaCode: "321", num: "123-4566" },
+    { customerId: "0002", areaCode: "174", num: "173-9902" },
+    { customerId: "0003", areaCode: "612", num: "897-1653" },
+    { customerId: "0004", areaCode: "952", num: "435-0918" },
+    { customerId: "0005", areaCode: "401", num: "816-4053" },
+ ]
+ ```
+
+ And this is what we want to end up w/:
+
+ ```
+ const phoneDict = {
+    "0001": {
+        customerId: "0001",
+        areaCode: "321",
+        num: "123-4566"
+    },
+    "0002": {
+        customerId: "0002",
+        areaCode: "174",
+        num: "173-9902"
+    },
+    // rest of data...  
+ }
+ ```
+
+ One thing we will need to go from an array of objects to the dictionary data format is a way to produce the key for each object we encounter in the `phoneList` array. To remain flexible, we will design the function such that whoever is asking for the list-to-dictionary conversion should also provide a function that we can use to obtain a key from each item in the list. A possible function signature could look like this:
+
+ ```
+ interface PhoneInfo {
+    customerId: string
+    areaCode: string
+    num: string
+ }
+
+ function listToDict(
+    list: PhoneInfo[], // take list as argument
+    idGen: (arg: PhoneInfo) => string // callback to get Ids
+ ): { [k: string]: PhoneInfo } {
+    // throws an error because there is no callback function yet
+    // return a dictionary
+ }
+ ```
+
+Let's throw in a `forEach` function to get rid of the error:
+
+```
+ function listToDict(
+    list: PhoneInfo[], // take list as argument
+    idGen: (arg: PhoneInfo) => string // callback to get Ids
+ ): { [k: string]: PhoneInfo } {
+    // create empty dictionary
+    const dict: { [k: string]: PhoneInfo } = {}
+
+    // loop through array
+    list.forEach((element) => {
+        const dictKey = idGen(element) // store element under key
+        dict[dictKey] = element
+    })
+
+    // return dictionary
+    return dict
+ }
+
+ console.log(
+    listToDict(phoneList, (item) => item.customerId)
+ )
+ ```
+
+ Let's now make the code more general and make it so it works for lists and dictionaries of the `PhoneInfo` type, but lots of other types as well. We could replace every `PhoneInfo` w/ any:
+
+```
+function listToDict(
+    list: any[],
+    idGen: (arg: any) => string
+ ): { [k: string]: any } {
+    
+    const dict: { [k: string]: any } = {}
+    list.forEach((element) => {
+        const dictKey = idGen(element)
+        dict[dictKey] = element
+    })
+
+    return dict
+ }
+
+const dict = listToDict(
+    [{ name: "James" }, { name: "Theodore" }, { name: "Jessica" }],
+    (item) => item.name
+)
+
+console.log(dict)
+```
+
+The problem w/ the above generic approach, is we lose the type safety. Now everything is an `any`. We need a mechanism to define a relationship between the type of the thing we're passed and the type of thing we'll return. This is what generics are all about. The first thing we need to do is define a type parameter which can be thought of as function arguments, but for types. Functions may return different values depending on the arguments you pass them. Generics may change their type, depending on the type parameters you use w/ them. The function signature is now going to include a type parameter `T`:
+
+```
+function listToDict<T>(
+    list: T[],
+    idGen: (arg: T) => string
+): { [k: string]: T } {
+    const dict: { [k: string]: T } = {}
+    return dict
+}
+```
+
+Here's a full breakdown of what the `T`(TypeParam) does in the above code:
+
+* `<T>` to the right of `listDict` — means that the type of this function is now parameterized in terms of a type parameter `T` (which may change on a per-usage basis). You do not have to use the letter 'T'.
+* `list: T[]` as a first argument means we accept a list of `T`'s which means on a per-invocation basis, you might end up with a different type `T`. `T` will become whatever it is being passed.
+    * TS will infer what `T` is on a per-usage basis depending on what kind of array is passed in. If it's a `string[]`, `T` will be `string`, if we use a `number[]`, `T` will be `number`.
+
+Here is a much simpler example:
+
+```
+function wrapInArray<T>(arg: T): [T] {
+    return [arg]
+}
+```
+
+In the above function, whatever gets passed to the function will get wrapped in an array. Let's take a look at some potential return types for the above function:
+
+```
+wrapInArray(3) // function wrapInArray<number>(arg: number): [number]
+
+wrapInArray(new Date()) // function wrapInArray<Date>(arg: Date): [Date]
+
+wrapInArray(new RegExp("/s/")) // function wrapInArray<RegExp>(arg: RegExp): [RegExp]
+```
+
+Back to the `listToDict` example, here's some more details about what `T` is doing:
+
+* `idGen: (arg: T) => string` is a callback that also uses `T` as an argument. This means:
+    * we will get the benefits of type checking within the `idGen` function
+    * we will get some type checking alignment between thhe array and the `idGen` function
+
+The last thing to look at in the `listToDict` example is the return type. Based on the way the function has been defined, a `T[]` will be urned into a `{ [k: string]: T }` for any `T` of our choosing.
+
+## Dictionary map, filter & reduce
+
+Exercise. Skipping notes.
+
+## Generics Scopes & Restraints
+
