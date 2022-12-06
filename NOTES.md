@@ -1,6 +1,6 @@
 ## Introduction
 
-TypeScript is an open source, typed syntactic superset of JavaScript. Meaning it starts w/ the JS syntax and layers additonal concepts on top. TS is maintained by Microsoft, the goal of TS is to add types to JS. Through the use of the TS compiler, TS compiles out to readable JS, and it comes in three parts; the programming language, the language server, and the language compiler. TS is popular. TS has surpassed React in downloads (which makes sense considering it is framework / library agnostic). But why would anyone care about TS? TS allows you, the developer, to leave more of your intent "on the page" / in the code. The kind of intent that is usually missing from pure JS code. Consider function parameters, how do you communicate what type of parameter (i.e. string, number, boolean) should be passed in to a function? With TS, you can assign types to define what is expected for a particular value:
+TypeScript is an open source, typed syntactic superset of JavaScript. Meaning it starts w/ the JS syntax and layers additional concepts on top. TS is maintained by Microsoft, the goal of TS is to add types to JS. Through the use of the TS compiler, TS compiles out to readable JS, and it comes in three parts; the programming language, the language server, and the language compiler. TS is popular. TS has surpassed React in downloads (which makes sense considering it is framework / library agnostic). But why would anyone care about TS? TS allows you, the developer, to leave more of your intent "on the page" / in the code. The kind of intent that is usually missing from pure JS code. Consider function parameters, how do you communicate what type of parameter (i.e. string, number, boolean) should be passed in to a function? With TS, you can assign types to define what is expected for a particular value:
 
 ```
 function add(a: number, b: number): number {
@@ -23,7 +23,7 @@ A: No. JS needs to remain backward compatible, so it is unlikely that TS feature
 
 ## Compiling a TypeScript Program
 
-With the minimum possible setup, let's compile a TS program w/ 3 files. The goals of this section are to get hands-on w/ TS and the compiler CLI, learn how the compiler-emitted JJS code changes depending on JS language level and module type, Examine a program's compiled output, including the type declaration file. For this minimal project, we'll have 3 files; `package.json` (package manifest), `tsconfig.json` (TS compiler settings), `src/index.ts` ("the program"). These files are here: `packages/hello-ts/src`. By deault, TS will put output files side-by-side w/ source code. Also by default, TS will output JS to support ES3 syntax (~IE6). Any of the options set in the `tsconfig.json` file can be passed as commands to the TS CLI, but as the complexity of the required configuration grows, using a config file is the better option. The `src/index.ts` file for this lesson is using a couple of JS features that came to the language in ES2015 (Promise) and ES2017 (async/await), which is important when looking at what the target and compiled output is. In a terminal, navigate to `packages/hello-ts` and run `yarn dev`. This will start the TS compiler. You should see a `dist` directory created, inside of which will be an `index.js` file. Take a look at what the ES3 output of that file looks like, then change the `tsconfig.json` target to ES2015, take another look at the `dist/index.js` file, then change the `tsconfig.json` target to ES2017, take another look at the `dist/index.js` file... You should have seen the `dist/index.js` file go from very large for ES3, to essentially the same as `src/index.ts` when setting the target to ES2017. The only difference should be that the TS types have been removed in the final output.
+With the minimum possible setup, let's compile a TS program w/ 3 files. The goals of this section are to get hands-on w/ TS and the compiler CLI, learn how the compiler-emitted JJS code changes depending on JS language level and module type, Examine a program's compiled output, including the type declaration file. For this minimal project, we'll have 3 files; `package.json` (package manifest), `tsconfig.json` (TS compiler settings), `src/index.ts` ("the program"). These files are here: `packages/hello-ts/src`. By default, TS will put output files side-by-side w/ source code. Also by default, TS will output JS to support ES3 syntax (~IE6). Any of the options set in the `tsconfig.json` file can be passed as commands to the TS CLI, but as the complexity of the required configuration grows, using a config file is the better option. The `src/index.ts` file for this lesson is using a couple of JS features that came to the language in ES2015 (Promise) and ES2017 (async/await), which is important when looking at what the target and compiled output is. In a terminal, navigate to `packages/hello-ts` and run `yarn dev`. This will start the TS compiler. You should see a `dist` directory created, inside of which will be an `index.js` file. Take a look at what the ES3 output of that file looks like, then change the `tsconfig.json` target to ES2015, take another look at the `dist/index.js` file, then change the `tsconfig.json` target to ES2017, take another look at the `dist/index.js` file... You should have seen the `dist/index.js` file go from very large for ES3, to essentially the same as `src/index.ts` when setting the target to ES2017. The only difference should be that the TS types have been removed in the final output.
 
 Q: Multi-target output? Use TS to output a modern bundle, then use Babel to transpile for older bowsers (if needed).
 
@@ -31,7 +31,7 @@ You may also notice a `.d.ts` file in the `dist` folder, this is a declaration f
 
 ## Variables & Values
 
-Using standard JS variable declaration of `let` or `const` (`var` would also work, but eww), TS can infer a type if the variable has been initialized w/ a value. And, if you have initialized a variable w/ a value, then try to assign a different value type to the variable (i.e. initialized w/ a number, try to assign a string), TS will throw an error. In TS, variables are "born" w/ their types. It's imoprtant to assign the types that your variables need to have when the variable is created. If you ever need to make a variable type more general, you usually have to go back to the initial variable definition to do so. When you declare a variable w/ `let`, TS will infer a type from the value the variable is assigned at initialization, if you assigned `6` to your variable, the infered type would be number. W/ `const`, TS will set the type equal to the value that the variable was initialized w/; if the `const` was initialized w/ the value of `6`, the inferred type is also `6`. Essentially, the value a `const` is assigned at initialization can ONLY ever be that type. The type `6` is what is known as a literal type in that it is literally the number 6. If a `let` declaration is a variable that can hold any number, the `const` declaration is one that can only hold `6` - a specific number.
+Using standard JS variable declaration of `let` or `const` (`var` would also work, but eww), TS can infer a type if the variable has been initialized w/ a value. And, if you have initialized a variable w/ a value, then try to assign a different value type to the variable (i.e. initialized w/ a number, try to assign a string), TS will throw an error. In TS, variables are "born" w/ their types. It's important to assign the types that your variables need to have when the variable is created. If you ever need to make a variable type more general, you usually have to go back to the initial variable definition to do so. When you declare a variable w/ `let`, TS will infer a type from the value the variable is assigned at initialization, if you assigned `6` to your variable, the inferred type would be number. W/ `const`, TS will set the type equal to the value that the variable was initialized w/; if the `const` was initialized w/ the value of `6`, the inferred type is also `6`. Essentially, the value a `const` is assigned at initialization can ONLY ever be that type. The type `6` is what is known as a literal type in that it is literally the number 6. If a `let` declaration is a variable that can hold any number, the `const` declaration is one that can only hold `6` - a specific number.
 
 Sometimes you need to declare a variable before it gets initialized and if you've not provided any type information, that variable will be assigned (by TS) the `any` type. `any` is the most flexible type in TS meaning it can be any value that is allowed in JS. To get the benefit of TS, we need to provide what is known as a type annotation to the uninitialized variable. i.e. `let endTime: Date`, note the colon after the variable, w/ the type following that. The same sort of syntax to type variables can also be applied to functions. Here's the same example we saw earlier that shows a typed function:
 
@@ -139,7 +139,7 @@ TS also includes excess property checking. If you try to pass an additional prop
 
 ## Index Signatures & Object Q&A
 
-We've learned how to type rigid objects, but what about dictionaries? A dictionary would be a consistent type of value that is stored under an arbitrary key, an example of which could be phone numbers; home, work, fax as keys, w/ an object w/ coountry code, area code, and number being the value. In order to type something like this, we would describe it using an index signature. Here's what an index signature for a dictionary of phone numbers could look like:
+We've learned how to type rigid objects, but what about dictionaries? A dictionary would be a consistent type of value that is stored under an arbitrary key, an example of which could be phone numbers; home, work, fax as keys, w/ an object w/ country code, area code, and number being the value. In order to type something like this, we would describe it using an index signature. Here's what an index signature for a dictionary of phone numbers could look like:
 
 ```
 const phones: {
@@ -173,7 +173,7 @@ A: Highly unlikely because having JS being a compile target works well enough.
 
 ## Structural vs Nominal Types
 
-Let's look at the different kinds of type systems and how they are categorized. But first, what is type checking? Type cheking is a task that attempts to evaluate the question of compatibility or type equivalence; i.e. is what is being passed to a function the same type that the function expects to receive? The same type check occurs when assigning a value to a variable. The same type check happens in a return.
+Let's look at the different kinds of type systems and how they are categorized. But first, what is type checking? Type checking is a task that attempts to evaluate the question of compatibility or type equivalence; i.e. is what is being passed to a function the same type that the function expects to receive? The same type check occurs when assigning a value to a variable. The same type check happens in a return.
 
 The second thing we should look into for different types of type systems is static or dynamic type systems. A static type system is one that checks types at compile, a dynamic type system is one that checks types at runtime. TS is a static type system.
 
@@ -284,9 +284,9 @@ export type UserContactInfo = {
 
 The convention for casing an alias is TitleCase. Type aliases are the rare occasion where you'll see type information on the right hand side of the assignment operator `=`.
 
-With inheritance, you can create type aliases that combine existing types with new behavior by using Intersection `&` types. There actally isn't 'true' inheritence in TS, but a similar outcome.
+With inheritance, you can create type aliases that combine existing types with new behavior by using Intersection `&` types. There actually isn't 'true' inheritance in TS, but a similar outcome.
 
-An interface is a way of defining an object type. An "object type" can be thought of as, "an instance of a class could conceivably look like this". The union type operator makes something not a object type. Like type aliases, interfaces can be imported/exported between modules just like values, and they serve to provide a "name" for a specific type. Just like type aliases, interfaces completely compile away and will not be present in the final output JS file. With interfaces, inheritance has a lot more formality aroundn it. TS calls JS classes that "inherit" behavior from a base class, heritage clauses, as the resultant inheritance has created an ancestral relationship. `extends` is used to describe inheritance between 'like' things, `implements` is used to describe inheritance between unlike things. Classes can "extend" from classes, interfaces can extend from other interfaces, but when working w/ classes and interfaces together, you will want to use the `implements` keyword:
+An interface is a way of defining an object type. An "object type" can be thought of as, "an instance of a class could conceivably look like this". The union type operator makes something not an object type. Like type aliases, interfaces can be imported/exported between modules just like values, and they serve to provide a "name" for a specific type. Just like type aliases, interfaces completely compile away and will not be present in the final output JS file. With interfaces, inheritance has a lot more formality around it. TS calls JS classes that "inherit" behavior from a base class, heritage clauses, as the resultant inheritance has created an ancestral relationship. `extends` is used to describe inheritance between 'like' things, `implements` is used to describe inheritance between unlike things. Classes can "extend" from classes, interfaces can extend from other interfaces, but when working w/ classes and interfaces together, you will want to use the `implements` keyword:
 
 ```
 interface AnimalLike {
@@ -317,17 +317,17 @@ interface AnimalLike {
 
 The above code is valid and works. But why would you want to be able to declare an interface of the same name in multiple places, effectively augmenting the interface? Imagine you want to add a global property to the `window` object or add something to an already existing interface. TS allows you to do that. How do you choose whether to use an interface or a type alias? In most situations, either would be perfectly fine, however:
 
-* If you need to define somehing other than an object type (i.e. use of the `|` union type operator), you must use a type alias
+* If you need to define something other than an object type (i.e. use of the `|` union type operator), you must use a type alias
 * If you need to define a type to use with the `implements` heritage term, it is best to use an interface
 * If you need to allow consumers of your types to augment them, you must use an interface
 
-Recursive types are self-referential and are often used to describe infinitely nestable types. Consider infinitely nestable arrays of numbers:
+Recursive types are self-referential and are often used to describe infinitely nest-able types. Consider infinitely nest-able arrays of numbers:
 
 ```
 ;[3, 4, [5, 6, [7], 59], 221]
 ```
 
-You may read or see things that indicate you must use a combination of `interface` and `type` for recursive types. As of TS 3.7, this is much easier and workswith either type aliases or interfaces:
+You may read or see things that indicate you must use a combination of `interface` and `type` for recursive types. As of TS 3.7, this is much easier and works with either type aliases or interfaces:
 
 ```
 type NesetdNumbers = number | NestedNumbers[]
@@ -822,7 +822,7 @@ Conceptually, what is happening above is very similar. By using the `asserts ___
 
 ## Nullish Values
 
-There are situations where you need to plan for and deal w/ the possibility that values are `null`, `undefined`, or `void`. `null` indicates that there is a value for something and that value is nothing. This nothing is very much a defined value, and is certainly a presence — not an absence — of infomation.
+There are situations where you need to plan for and deal w/ the possibility that values are `null`, `undefined`, or `void`. `null` indicates that there is a value for something and that value is nothing. This nothing is very much a defined value, and is certainly a presence — not an absence — of information.
 
 ```
 const userInfo = {
@@ -832,7 +832,7 @@ const userInfo = {
 }
 ```
 
-`undefined` means the value isn't available (yet?). In the following example, `completedAt` will be set at some point but there is a period of time when it hasn't been set. `undefined` is an unambiguous indication thhat there may be something different in the future:
+`undefined` means the value isn't available (yet?). In the following example, `completedAt` will be set at some point but there is a period of time when it hasn't been set. `undefined` is an unambiguous indication that there may be something different in the future:
 
 ```
 const formInProgress = {
@@ -862,15 +862,15 @@ type GroceryCart = {
 
 const cart: GroceryCart = {}
 
-cart.fruits.push({ name: "kumkuat", qty: 1 })
+cart.fruits.push({ name: "kumquat", qty: 1 })
 // Object is possibly 'undefined'
 
-cart.fruits!.push({ name: "kumkuat", qty: 1 })
+cart.fruits!.push({ name: "kumquat", qty: 1 })
 ```
 
 It is not recommended to use the non-null assertion operator in your app, but if your test infrastructure represents a `throw` as a test failure (most should) this is a great type guard to use in your test suite. In the above situation, if `fruits` was expected to be present ans it isn't, that is a reasonable test failure.
 
-The definite assignment `!:` operator is used to supress TS's objections about a class field being used, when it can't be proven that it was initialized:
+The definite assignment `!:` operator is used to suppress TS's objections about a class field being used, when it can't be proven that it was initialized:
 
 ```
 class ThingWithAsyncSetup {
@@ -1051,7 +1051,7 @@ Back to the `listToDict` example, here's some more details about what `T` is doi
 
 * `idGen: (arg: T) => string` is a callback that also uses `T` as an argument. This means:
     * we will get the benefits of type checking within the `idGen` function
-    * we will get some type checking alignment between thhe array and the `idGen` function
+    * we will get some type checking alignment between the array and the `idGen` function
 
 The last thing to look at in the `listToDict` example is the return type. Based on the way the function has been defined, a `T[]` will be urned into a `{ [k: string]: T }` for any `T` of our choosing.
 
@@ -1059,5 +1059,159 @@ The last thing to look at in the `listToDict` example is the return type. Based 
 
 Exercise. Skipping notes.
 
-## Generics Scopes & Restraints
+## Generics Scopes & Constraints
 
+The final topic of this workshop is generic scopes and constraints. Scopes and constraints have to do w/ where you can use type parameters, depending on where they're defined and the minimum constraints you can impose on type parameters. But why would we care about scopes and constraints, what would be missing if we did not have these things? Let's take another look at the example we had from the Generics section:
+
+```
+function listToDict<T>(
+    list: T[], // array as input
+    idGen: (arg: T) => string // fn for obtaining item's id
+): { [k: string]: T } {
+    // create dict to fill
+    const dict: { [k: string]: T } = {}
+
+    for (let item of list) {
+        // for each item
+        dict[idGen(item)] = item // make a key store in dict
+    }
+
+    return dict // result
+}
+```
+
+We need to define what kind of things we expect to be in the list, let's strip away some of the noise from the above example and just study the function signature:
+
+```
+function listToDict<T>(
+    list: T[],
+    idGen: (arg: T) => string
+): { [k: string]: T } {
+    return {}
+}
+```
+
+In the above situation, the caller of `listToDict` is asked to provide a means of obtaining an `id`, but imagine that every type we wish to use with this has an `id: string` property and we should just use that as the key. How might we implement that w/out generics?
+
+```
+interface HasId {
+    id: string
+}
+
+interface Dict<T> {
+    [k: string]: T
+}
+
+function listToDict(list: HasId[]): Dict<HasId> {
+    const dict: Dict<HasId> = {}
+
+    list.forEach((item) => {
+        dict[item.id] = item
+    })
+
+    return dict
+}
+```
+
+Here's how we would implement the above w/ generics:
+
+```
+interface HasId {
+    id: string
+}
+
+interface Dict<T> {
+    [k: string]: T
+}
+
+function listToDict<T>(list: T[]): Dict<T> {
+    const dict: Dict<T> = {}
+
+    list.forEach((item) => {
+        dict[item.id] = item // error property 'is' does not exist on type T
+    })
+
+    return dict
+}
+```
+
+The above is a naive approach that would fail. This is because `T` could be anything and is of type `any`. We need something that allows us to always have the `id` property there. We need to define the constraints on the generic by using the `extends` keyword. The correct way of making the `listToDict` function generic is shown here:
+
+```
+function listToDict<T extends HasId>(list: T[]): Dict<T> {
+    ...
+}
+```
+
+Now, the "requirement" for the argument type `HasId[]` is represented in two places:
+
+* `extends HasId` as the constraint on `T`
+* `list: T[]` to ensure that we receive an array
+
+The `extends` keyword is used in object-oriented inheritance, and while not strictly equivalent to how it is used w/ type params, there is a conceptual connection: When a class extends from a base class, it is guaranteed to at least align w/ the base class structure. In the same way, `T extends HasId` guarantees that "T is at least a HasId".
+
+When working w/ function parameters, we know that "inner scopes" have the ability to access "outer scopes" but not vice versa:
+
+```
+function receiveFruitBasket(bowl) {
+    console.log("Thanks for the fruit basket!")
+    // only `bowl` can be accessed here
+    eatApple(bowl, (apple) => {
+        // both `bowl` and `apple` can be accessed here
+    })
+}
+```
+
+Type params work in a similar way:
+
+```
+// outer function
+function tupleCreator<T>(first: T) {
+    // inner function
+    return function finish<S>(last: S): [T, S] {
+        return [first, last]
+    }
+
+    const finishTuple = tupleCreator(3)
+    const t1 = finishTuple(null)
+    const t2 = finishTuple([4, 8, 15, 16, 23, 42])
+}
+```
+
+The same design principles that you use for deciding whether values belong as class fields vs. arguments passed to members should serve you well here. Remember, this is not exactly an independent decision to make, as types belong to the same scope as the values they describe.
+
+Use each parameter at least twice. Any less and you might be casting w/ the `as` keyword. Here's an example:
+
+```
+function returnAs<T>(arg: any): T {
+    return arg
+}
+
+// Danger zone
+
+const first = returnAs<number>(window) // type is number
+
+const sameAs = window as any as number // type is number
+```
+
+In the above example, TS will think `window` is a `number` and will fail to catch errors that it is supposed to be catching. Define type parameters as simply as possible. Consider these two options for `listToDict`:
+
+```
+interface HasId {
+    id: string
+}
+
+interface Dict<T> {
+    [k: string]: T
+}
+
+function ex1<T extends HasId[]>(list: T) {
+    return list.pop()
+}
+
+function ex2<T extends HasId>(list: T[]) {
+    return list.pop()
+}
+```
+
+Finally, only use type parameters when you have a real need for them. They introduce complexity, and you should not be adding complexity to your code unless it is worth it. Premature abstraction is bad!
